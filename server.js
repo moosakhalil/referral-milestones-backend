@@ -18,13 +18,17 @@ app.use("/api/milestones", milestonesRouter);
 
 app.get("/", (_req, res) => res.json({ status: "Referral Milestone API running" }));
 
-mongoose
-  .connect(MONGODB_URI)
-  .then(() => {
-    console.log("MongoDB connected");
-    app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
-  })
-  .catch((err) => {
-    console.error("MongoDB connection error:", err.message);
-    process.exit(1);
-  });
+// Start HTTP server immediately so Render can detect the open port.
+app.listen(PORT, "0.0.0.0", () =>
+  console.log(`Server running on http://0.0.0.0:${PORT}`)
+);
+
+// Connect to MongoDB in the background.
+if (!MONGODB_URI) {
+  console.error("MONGODB_URI is not set. Set it in environment variables.");
+} else {
+  mongoose
+    .connect(MONGODB_URI)
+    .then(() => console.log("MongoDB connected"))
+    .catch((err) => console.error("MongoDB connection error:", err.message));
+}
