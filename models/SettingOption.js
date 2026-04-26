@@ -11,12 +11,13 @@ const settingOptionSchema = new mongoose.Schema(
       index: true,
     },
     value: { type: String, required: true, trim: true },
+    group: { type: String, default: "", trim: true },
     order: { type: Number, default: 0 },
   },
   { timestamps: true }
 );
 
-settingOptionSchema.index({ category: 1, value: 1 }, { unique: true });
+settingOptionSchema.index({ category: 1, group: 1, value: 1 }, { unique: true });
 
 const SettingOption = mongoose.model("SettingOption", settingOptionSchema);
 SettingOption.CATEGORIES = CATEGORIES;
