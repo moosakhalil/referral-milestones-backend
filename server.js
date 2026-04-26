@@ -5,6 +5,7 @@ const path = require("path");
 const mongoose = require("mongoose");
 
 const milestonesRouter = require("./routes/milestones");
+const settingsRouter = require("./routes/settings");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -18,6 +19,7 @@ app.use(express.json({ limit: "10mb" }));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use("/api/milestones", milestonesRouter);
+app.use("/api/settings", settingsRouter);
 
 app.get("/", (_req, res) => res.json({ status: "Referral Milestone API running" }));
 
@@ -32,6 +34,11 @@ if (!MONGODB_URI) {
 } else {
   mongoose
     .connect(MONGODB_URI)
-    .then(() => console.log("MongoDB connected"))
+    .then(() => {
+      console.log("MongoDB connected");
+      settingsRouter.seedDefaults?.().catch((err) =>
+        console.error("Settings seed error:", err.message)
+      );
+    })
     .catch((err) => console.error("MongoDB connection error:", err.message));
 }
