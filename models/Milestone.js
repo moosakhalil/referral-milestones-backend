@@ -30,6 +30,7 @@ const milestoneSchema = new mongoose.Schema(
       value: { type: String, default: "" },
       usage: { type: String, default: "1-time use" },
       minimumSpendToUse: { type: Number, default: 0 },
+      freeNumberPeople: { type: [String], default: [] },
     },
     rules: {
       rule1: { type: String, default: "" },
