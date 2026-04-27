@@ -31,7 +31,7 @@ const HOLIDAY_BASE = [
   "Sale (Ramadan)",
   "Sale (Eid)",
   "Sale (Eid al-Adha)",
-  "Sale (Good Friday)",
+  "Sale (Black Friday)",
   "Sale (Nyepi)",
 ];
 
