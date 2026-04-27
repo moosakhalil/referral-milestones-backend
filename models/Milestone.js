@@ -18,7 +18,6 @@ const milestoneSchema = new mongoose.Schema(
       default: "No",
     },
     discountBatchCatalogId: { type: String, default: "" },
-    whichMode: { type: String, enum: ["which", "List"], default: "which" },
     whatIsIt: { type: String, default: "" },
     requirements: {
       minimumSpend: { type: Number, default: 0 },

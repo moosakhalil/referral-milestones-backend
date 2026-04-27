@@ -37,8 +37,7 @@ const upload = multer({
 // POST /api/milestones/upload-image
 router.post("/upload-image", upload.single("image"), (req, res) => {
   if (!req.file) return res.status(400).json({ error: "No file uploaded" });
-  const proto = req.headers["x-forwarded-proto"] || req.protocol;
-  const url = `${proto}://${req.get("host")}/uploads/${req.file.filename}`;
+  const url = `/uploads/${req.file.filename}`;
   res.json({ url });
 });
 
