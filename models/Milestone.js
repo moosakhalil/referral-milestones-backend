@@ -55,6 +55,7 @@ const milestoneSchema = new mongoose.Schema(
       everyTimeHitReferred: { type: String, default: "" },
       referrals: { type: String, default: "" },
       everyTimeMix: { type: String, default: "" },
+      need: { type: String, default: "" },
     },
     extraNotes: { type: String, default: "" },
     connectedToModule: { type: String, default: "" },
