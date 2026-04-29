@@ -8,6 +8,7 @@ const milestonesRouter = require("./routes/milestones");
 const settingsRouter = require("./routes/settings");
 const userNotesRouter = require("./routes/userNotes");
 const discountNotesRouter = require("./routes/discountNotes");
+const scenariosRouter = require("./routes/scenarios");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -24,6 +25,7 @@ app.use("/api/milestones", milestonesRouter);
 app.use("/api/settings", settingsRouter);
 app.use("/api/user-notes", userNotesRouter);
 app.use("/api/discount-notes", discountNotesRouter);
+app.use("/api/scenarios", scenariosRouter);
 
 app.get("/", (_req, res) => res.json({ status: "Referral Milestone API running" }));
 

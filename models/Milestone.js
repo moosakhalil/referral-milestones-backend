@@ -63,6 +63,7 @@ const milestoneSchema = new mongoose.Schema(
     exampleTextToCustomer: { type: String, default: "" },
     connectedToModule: { type: String, default: "" },
     active: { type: Boolean, default: true },
+    deletedAt: { type: Date, default: null },
   },
   { timestamps: true }
 );

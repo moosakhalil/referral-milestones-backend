@@ -41,10 +41,20 @@ router.post("/upload-image", upload.single("image"), (req, res) => {
   res.json({ url });
 });
 
-// GET /api/milestones - list all
+// GET /api/milestones - list all (non-deleted)
 router.get("/", async (_req, res) => {
   try {
-    const items = await Milestone.find().sort({ createdAt: -1 });
+    const items = await Milestone.find({ deletedAt: null }).sort({ createdAt: -1 });
+    res.json(items);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// GET /api/milestones/deleted - list soft-deleted (must be before /:id)
+router.get("/deleted", async (_req, res) => {
+  try {
+    const items = await Milestone.find({ deletedAt: { $ne: null } }).sort({ deletedAt: -1 });
     res.json(items);
   } catch (e) {
     res.status(500).json({ error: e.message });
@@ -54,7 +64,7 @@ router.get("/", async (_req, res) => {
 // GET /api/milestones/:id
 router.get("/:id", async (req, res) => {
   try {
-    const item = await Milestone.findById(req.params.id);
+    const item = await Milestone.findOne({ _id: req.params.id, deletedAt: null });
     if (!item) return res.status(404).json({ error: "Not found" });
     res.json(item);
   } catch (e) {
@@ -75,16 +85,32 @@ router.post("/", async (req, res) => {
   }
 });
 
+// PUT /api/milestones/:id/restore - restore a soft-deleted milestone
+router.put("/:id/restore", async (req, res) => {
+  try {
+    const item = await Milestone.findOneAndUpdate(
+      { _id: req.params.id, deletedAt: { $ne: null } },
+      { $set: { deletedAt: null } },
+      { new: true }
+    );
+    if (!item) return res.status(404).json({ error: "Not found or not deleted" });
+    res.json(item);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // PUT /api/milestones/:id
 router.put("/:id", async (req, res) => {
   try {
     if (req.body.nameOfItem === "") {
       return res.status(400).json({ error: "nameOfItem is required" });
     }
-    const item = await Milestone.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const item = await Milestone.findOneAndUpdate(
+      { _id: req.params.id, deletedAt: null },
+      req.body,
+      { new: true, runValidators: true }
+    );
     if (!item) return res.status(404).json({ error: "Not found" });
     res.json(item);
   } catch (e) {
@@ -92,10 +118,29 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// DELETE /api/milestones/:id
-router.delete("/:id", async (req, res) => {
+// DELETE /api/milestones/:id/permanent - hard delete with image cleanup
+router.delete("/:id/permanent", async (req, res) => {
   try {
     const item = await Milestone.findByIdAndDelete(req.params.id);
+    if (!item) return res.status(404).json({ error: "Not found" });
+    if (item.imageUrl && item.imageUrl.startsWith("/uploads/")) {
+      const filePath = path.join(__dirname, "..", item.imageUrl);
+      fs.unlink(filePath, () => {});
+    }
+    res.json({ success: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// DELETE /api/milestones/:id - soft delete (move to trash)
+router.delete("/:id", async (req, res) => {
+  try {
+    const item = await Milestone.findOneAndUpdate(
+      { _id: req.params.id, deletedAt: null },
+      { $set: { deletedAt: new Date() } },
+      { new: true }
+    );
     if (!item) return res.status(404).json({ error: "Not found" });
     res.json({ success: true });
   } catch (e) {
