@@ -6,6 +6,7 @@ const milestoneSchema = new mongoose.Schema(
     badgeGroup: { type: String, default: "" },
     userType: { type: String, default: "" },
     nameOfItem: { type: String, required: true },
+    itemNumber: { type: Number, default: null },
     nameGroupHeading: { type: String, default: "" },
     systemMode: {
       type: String,
@@ -58,6 +59,7 @@ const milestoneSchema = new mongoose.Schema(
       need: { type: String, default: "" },
     },
     extraNotes: { type: String, default: "" },
+    systemRules: { type: String, default: "" },
     connectedToModule: { type: String, default: "" },
     active: { type: Boolean, default: true },
   },
