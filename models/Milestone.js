@@ -60,6 +60,7 @@ const milestoneSchema = new mongoose.Schema(
     },
     extraNotes: { type: String, default: "" },
     systemRules: { type: String, default: "" },
+    exampleTextToCustomer: { type: String, default: "" },
     connectedToModule: { type: String, default: "" },
     active: { type: Boolean, default: true },
   },
