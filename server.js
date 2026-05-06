@@ -10,6 +10,8 @@ const userNotesRouter = require("./routes/userNotes");
 const discountNotesRouter = require("./routes/discountNotes");
 const scenariosRouter = require("./routes/scenarios");
 const coreNotesRouter = require("./routes/coreNotes");
+const dailyFillersRouter = require("./routes/dailyFillers");
+const wheelsRouter = require("./routes/wheels");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -28,6 +30,8 @@ app.use("/api/user-notes", userNotesRouter);
 app.use("/api/discount-notes", discountNotesRouter);
 app.use("/api/scenarios", scenariosRouter);
 app.use("/api/core-notes", coreNotesRouter);
+app.use("/api/daily-fillers", dailyFillersRouter);
+app.use("/api/wheels", wheelsRouter);
 
 app.get("/", (_req, res) => res.json({ status: "Referral Milestone API running" }));
 
@@ -46,6 +50,12 @@ if (!MONGODB_URI) {
       console.log("MongoDB connected");
       settingsRouter.seedDefaults?.().catch((err) =>
         console.error("Settings seed error:", err.message)
+      );
+      dailyFillersRouter.seedDefaults?.().catch((err) =>
+        console.error("Daily fillers seed error:", err.message)
+      );
+      wheelsRouter.seedDefaults?.().catch((err) =>
+        console.error("Wheels seed error:", err.message)
       );
     })
     .catch((err) => console.error("MongoDB connection error:", err.message));
