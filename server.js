@@ -12,6 +12,7 @@ const scenariosRouter = require("./routes/scenarios");
 const coreNotesRouter = require("./routes/coreNotes");
 const dailyFillersRouter = require("./routes/dailyFillers");
 const wheelsRouter = require("./routes/wheels");
+const exportRouter = require("./routes/export");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -32,6 +33,7 @@ app.use("/api/scenarios", scenariosRouter);
 app.use("/api/core-notes", coreNotesRouter);
 app.use("/api/daily-fillers", dailyFillersRouter);
 app.use("/api/wheels", wheelsRouter);
+app.use("/api/export", exportRouter);
 
 app.get("/", (_req, res) => res.json({ status: "Referral Milestone API running" }));
 
