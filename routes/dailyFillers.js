@@ -6,7 +6,7 @@ const router = express.Router();
 const DEFAULTS = [
   {
     type: "cashback",
-    label: "Cashback Filler",
+    label: "Filling Cashback Wheel",
     value: 5,
     valueType: "%",
     expiryDays: 30,
@@ -14,7 +14,7 @@ const DEFAULTS = [
   },
   {
     type: "discount",
-    label: "Discount Filler",
+    label: "Filling Discount Wheel",
     value: 10,
     valueType: "%",
     expiryDays: 30,
@@ -27,6 +27,20 @@ async function seedDefaults() {
   if (count === 0) {
     await DailyFiller.insertMany(DEFAULTS);
     console.log("Daily filler defaults seeded");
+  }
+
+  // Migration: rename legacy filler labels to the new "Filling … Wheel" format.
+  try {
+    await DailyFiller.updateOne(
+      { type: "cashback", label: "Cashback Filler" },
+      { $set: { label: "Filling Cashback Wheel" } }
+    );
+    await DailyFiller.updateOne(
+      { type: "discount", label: "Discount Filler" },
+      { $set: { label: "Filling Discount Wheel" } }
+    );
+  } catch (e) {
+    console.warn("Daily filler label migration failed:", e.message);
   }
 }
 

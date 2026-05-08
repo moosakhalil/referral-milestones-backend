@@ -27,15 +27,15 @@ const SHARED_CUSTOMER_TEXTS = [
 ];
 
 const DEFAULTS = [
-  // ── Cashback wheel ────────────────────────────────────────────────────────
+  // ── Filling Cashback Wheel ────────────────────────────────────────────────────────
   {
     key: "cashback",
-    title: "Cashback Wheel",
+    title: "Filling Cashback Wheel",
     subtitle: "Filler reward · credited to wallet",
     rotationSlots: [
       { label: "1% cashback to wallet", rewardType: "%", value: "1", destination: "wallet", probability: 0 },
       { label: "2% cashback to wallet", rewardType: "%", value: "2", destination: "wallet", probability: 0 },
-      { label: "Cashback Wheel OR 0.5% cashback to wallet", rewardType: "%", value: "0.5", destination: "wallet", probability: 0, notes: "When this slot lands, customer gets to spin the cashback wheel below." },
+      { label: "Filling Cashback Wheel OR 0.5% cashback to wallet", rewardType: "%", value: "0.5", destination: "wallet", probability: 0, notes: "When this slot lands, customer gets to spin the cashback wheel below." },
     ],
     segments: [
       { label: "2% cashback",                 rewardType: "%",     value: "2",       destination: "wallet",  probability: 10 },
@@ -54,15 +54,15 @@ const DEFAULTS = [
     integrationNotes: "",
   },
 
-  // ── Discount wheel ────────────────────────────────────────────────────────
+  // ── Filling Discount Wheel ────────────────────────────────────────────────────────
   {
     key: "discount",
-    title: "Discount Wheel",
+    title: "Filling Discount Wheel",
     subtitle: "Filler reward · applied to next bill",
     rotationSlots: [
       { label: "1% discount on next bill", rewardType: "%", value: "1", destination: "next bill", probability: 0 },
       { label: "2% discount on next bill", rewardType: "%", value: "2", destination: "next bill", probability: 0 },
-      { label: "Discount Wheel OR 0.5% discount on next bill", rewardType: "%", value: "0.5", destination: "next bill", probability: 0, notes: "When this slot lands, customer gets to spin the discount wheel below." },
+      { label: "Filling Discount Wheel OR 0.5% discount on next bill", rewardType: "%", value: "0.5", destination: "next bill", probability: 0, notes: "When this slot lands, customer gets to spin the discount wheel below." },
     ],
     segments: [
       { label: "2% discount",                 rewardType: "%",     value: "2",       destination: "next bill", probability: 10 },
@@ -164,6 +164,20 @@ async function seedDefaults() {
       await WheelConfig.create(def);
       console.log(`Wheel config seeded: ${def.key}`);
     }
+  }
+
+  // Migration: rename legacy wheel titles to the new "Filling … Wheel" format.
+  try {
+    await WheelConfig.updateOne(
+      { key: "cashback", title: "Cashback Wheel" },
+      { $set: { title: "Filling Cashback Wheel" } }
+    );
+    await WheelConfig.updateOne(
+      { key: "discount", title: "Discount Wheel" },
+      { $set: { title: "Filling Discount Wheel" } }
+    );
+  } catch (e) {
+    console.warn("Wheel title migration failed:", e.message);
   }
 }
 
