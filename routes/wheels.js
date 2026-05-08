@@ -81,21 +81,21 @@ const DEFAULTS = [
     integrationNotes: "",
   },
 
-  // ── Gamble wheel (general milestone wheel) ────────────────────────────────
+  // ── Reward Wheel — general milestone wheel ──────────────────────────────
   {
-    key: "gamble",
-    title: "Gamble (Spin a Wheel)",
+    key: "reward",
+    title: "Reward Wheel",
     subtitle: "General milestone wheel · IRREGULAR + SURPRISE every ~5 milestones",
     rotationSlots: [],
-    segments: [], // gamble outcomes are described in `stats` instead
+    segments: [], // Reward Wheel outcomes are described in `stats` instead
     customerTexts: [
       "🔥 Bro I just hit a milestone and got DOUBLE 😳",
       "🎰 Spin to upgrade — better odds with gift cards.",
     ],
     nudgeTexts: [
-      "🔥 You are 2 referrals away from UNLOCKING a reward gamble … don't miss it.",
-      "🔥 You are 2 referrals away from UNLOCKING a reward gamble (up to 500k)… don't miss it.",
-      "Only 2 more levels to reach before the next gamble — maybe the next one has it…",
+      "🔥 You are 2 referrals away from UNLOCKING a Reward Wheel … don't miss it.",
+      "🔥 You are 2 referrals away from UNLOCKING a Reward Wheel (up to 500k)… don't miss it.",
+      "Only 2 more levels to reach before the next Reward Wheel — maybe the next one has it…",
     ],
     statsSampleSize: 104,
     stats: [
@@ -109,11 +109,11 @@ const DEFAULTS = [
       { label: "Win 600k jackpot",                                                probability: 1,  value: "600k", notes: "Send WhatsApp to friend list: \"Rina won jackpot 🎰\"" },
     ],
     rules: [
-      "CORE LOGIC: Every ~5 milestones — 4 guaranteed rewards + 5th = UPGRADE GAMBLE.",
+      "CORE LOGIC: Every ~5 milestones — 4 guaranteed rewards + 5th = UPGRADE Reward Wheel.",
       "Don't fix the ratio at 1/5; keep it IRREGULAR + SURPRISE.",
-      "Examples: M3→no, M7→gamble, M11→gamble, M18→BIG gamble, M25→no.",
-      "Send hook text 2 levels before next gamble: \"Maybe next one has it…\"",
-      "Early levels → smaller gamble (safe feeling). Mid levels → better rewards.",
+      "Examples: M3→no, M7→reward spin, M11→reward spin, M18→BIG reward spin, M25→no.",
+      "Send hook text 2 levels before next Reward Wheel: \"Maybe next one has it…\"",
+      "Early levels → smaller Reward Wheel (safe feeling). Mid levels → better rewards.",
       "",
       "ACTIVATION:",
       "• Customer must complete a single-bill purchase of 500k to trigger the wheel.",
@@ -125,8 +125,8 @@ const DEFAULTS = [
       "",
       "EXPIRY:",
       "• 14-bill window for the wheel to be activated.",
-      "• If no qualifying purchase is made within 14 bills, the OLDEST gambling wheel is lost.",
-      "• Maximum of 3 consecutive gambling wheels can be held at any time.",
+      "• If no qualifying purchase is made within 14 bills, the OLDEST Reward Wheel is lost.",
+      "• Maximum of 3 consecutive Reward Wheel entries can be held at any time.",
       "",
       "ON JACKPOT:",
       "• Send WhatsApp to the customer's friend list: \"Rina won jackpot 🎰\".",
@@ -139,6 +139,25 @@ const DEFAULTS = [
 ];
 
 async function seedDefaults() {
+  // Migration: rename legacy "gamble" wheel doc to "reward".
+  try {
+    const legacy = await WheelConfig.findOne({ key: "gamble" });
+    if (legacy) {
+      const already = await WheelConfig.findOne({ key: "reward" });
+      if (already) {
+        // A "reward" doc already exists — drop the stale "gamble" copy.
+        await WheelConfig.deleteOne({ _id: legacy._id });
+        console.log('Wheel config migration: removed duplicate legacy "gamble" doc.');
+      } else {
+        legacy.key = "reward";
+        await legacy.save();
+        console.log('Wheel config migration: renamed key "gamble" → "reward".');
+      }
+    }
+  } catch (e) {
+    console.warn("Wheel config migration (gamble → reward) failed:", e.message);
+  }
+
   for (const def of DEFAULTS) {
     const existing = await WheelConfig.findOne({ key: def.key });
     if (!existing) {
@@ -172,7 +191,7 @@ router.get("/:key", async (req, res) => {
 // PUT /api/wheels/:key  — full upsert update
 router.put("/:key", async (req, res) => {
   try {
-    const allowed = ["cashback", "discount", "gamble"];
+    const allowed = ["cashback", "discount", "reward"];
     if (!allowed.includes(req.params.key)) {
       return res.status(400).json({ error: "Invalid wheel key" });
     }

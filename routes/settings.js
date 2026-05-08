@@ -10,7 +10,7 @@ const DEFAULTS = {
     "Builder",
     "Investments",
     "Support",
-    "Gambling (Spin a Wheel)",
+    "Reward Wheel",
     "Cash Reward",
     "Passive Income",
     "Discount",
@@ -90,9 +90,45 @@ const headingRank = (h) => {
 
 const isValidCategory = (c) => CATEGORIES.includes(c);
 
+// Migration: rename legacy badge-group labels to "Reward Wheel".
+async function migrateRewardBadgeLabel() {
+  const Milestone = require("../models/Milestone");
+  const LEGACY = ["Gambling (Spin a Wheel)", "Reward (Spin a Wheel)"];
+  const NEW = "Reward Wheel";
+
+  try {
+    // 1) Settings dropdown options
+    for (const old of LEGACY) {
+      const dupe = await SettingOption.findOne({
+        category: "badgeGroup",
+        value: NEW,
+      });
+      if (dupe) {
+        // Target value already exists — drop the legacy entries.
+        await SettingOption.deleteMany({ category: "badgeGroup", value: old });
+      } else {
+        await SettingOption.updateMany(
+          { category: "badgeGroup", value: old },
+          { $set: { value: NEW } }
+        );
+      }
+    }
+
+    // 2) Existing milestone records that stored the old label
+    await Milestone.updateMany(
+      { badgeGroup: { $in: LEGACY } },
+      { $set: { badgeGroup: NEW } }
+    );
+  } catch (e) {
+    console.warn("Reward badge-label migration failed:", e.message);
+  }
+}
+
 // Seed defaults if a category is empty. Auto-migrate discountCatalog to the
 // new grouped structure if old flat records exist (no group field set).
 async function seedDefaults() {
+  // Run rename migration before seeding so duplicates aren't recreated.
+  await migrateRewardBadgeLabel();
   // Flat categories
   for (const cat of ["badgeGroup", "userType"]) {
     const count = await SettingOption.countDocuments({ category: cat });

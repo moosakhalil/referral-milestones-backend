@@ -14,7 +14,7 @@ const segmentSchema = new mongoose.Schema(
   { _id: false }
 );
 
-// Generic statistic row used by the gamble wheel (e.g. "26% will win only 5k IRD").
+// Generic statistic row used by the Reward Wheel (e.g. "26% will win only 5k IRD").
 const statRowSchema = new mongoose.Schema(
   {
     label: { type: String, default: "" },
@@ -30,7 +30,7 @@ const wheelConfigSchema = new mongoose.Schema(
     // wheel identifier — one document per wheel
     key: {
       type: String,
-      enum: ["cashback", "discount", "gamble"],
+      enum: ["cashback", "discount", "reward"],
       required: true,
       unique: true,
     },
@@ -52,7 +52,7 @@ const wheelConfigSchema = new mongoose.Schema(
     // Pre-spin / nudge messages (e.g. "You are 2 referrals away…").
     nudgeTexts: { type: [String], default: [] },
 
-    // Stats spec (gamble): "from 104 spins, 26% win 5k IRD…".
+    // Stats spec (Reward Wheel): "from 104 spins, 26% win 5k IRD…".
     stats: { type: [statRowSchema], default: [] },
     statsSampleSize: { type: Number, default: 0 },
 
