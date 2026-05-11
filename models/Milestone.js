@@ -52,7 +52,7 @@ const milestoneSchema = new mongoose.Schema(
       anyOtherDetails: { type: String, default: "" },
     },
     repetitive: {
-      enabled: { type: String, enum: ["Yes", "No"], default: "No" },
+      enabled: { type: String, enum: ["Yes", "No", "Neutral"], default: "No" },
       everyTimeHitAmount: { type: String, default: "" },
       everyTimeHitWhatsappStatus: { type: String, default: "" },
       everyTimeHitReferred: { type: String, default: "" },
