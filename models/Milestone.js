@@ -50,6 +50,8 @@ const milestoneSchema = new mongoose.Schema(
       otherwise: { type: String, default: "" },
       exceptions: { type: String, default: "" },
       anyOtherDetails: { type: String, default: "" },
+      maxLimitation: { type: String, default: "" },
+      durationForLimitation: { type: String, default: "" },
     },
     repetitive: {
       enabled: { type: String, enum: ["Yes", "No", "Neutral"], default: "No" },
@@ -59,6 +61,8 @@ const milestoneSchema = new mongoose.Schema(
       referrals: { type: String, default: "" },
       everyTimeMix: { type: String, default: "" },
       need: { type: String, default: "" },
+      maxLimitation: { type: String, default: "" },
+      durationForLimitation: { type: String, default: "" },
     },
     extraNotes: { type: String, default: "" },
     systemRules: { type: String, default: "" },
