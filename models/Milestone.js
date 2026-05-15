@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const milestoneSchema = new mongoose.Schema(
   {
+    code: { type: String, unique: true, sparse: true },
     imageUrl: { type: String, default: "" },
     badgeGroup: { type: String, default: "" },
     userType: { type: String, default: "" },
@@ -20,6 +21,7 @@ const milestoneSchema = new mongoose.Schema(
     },
     discountBatchCatalogId: { type: String, default: "" },
     whatIsIt: { type: String, default: "" },
+    operatingPath: { type: String, enum: ["requirements", "repetitive", ""], default: "" },
     requirements: {
       minimumSpend: { type: Number, default: 0 },
       whatsappStatusLevel: { type: Number, default: 0 },
@@ -31,7 +33,7 @@ const milestoneSchema = new mongoose.Schema(
       value: { type: String, default: "" },
       usage: { type: String, default: "1-time use" },
       minimumSpendToUse: { type: Number, default: 0 },
-      freeNumberPeople: { type: [String], default: [] },
+      freePeopleFood: { type: [String], default: [] },
     },
     realCostDollar: { type: Number, default: null },
     realCostPercentage: { type: Number, default: null },

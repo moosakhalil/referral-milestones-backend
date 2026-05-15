@@ -6,6 +6,25 @@ const Milestone = require("../models/Milestone");
 
 const router = express.Router();
 
+// ---- Auto-generate unique code helper ----
+async function generateNextCode() {
+  const lastMilestone = await Milestone.findOne({ code: { $exists: true, $ne: null } })
+    .sort({ code: -1 })
+    .select('code');
+  
+  if (!lastMilestone || !lastMilestone.code) {
+    return 'M001';
+  }
+  
+  const match = lastMilestone.code.match(/^M(\d+)$/);
+  if (match) {
+    const nextNum = parseInt(match[1], 10) + 1;
+    return 'M' + String(nextNum).padStart(3, '0');
+  }
+  
+  return 'M001';
+}
+
 // ---- Multer setup for image upload ----
 const uploadDir = path.join(__dirname, "..", "uploads");
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
@@ -78,6 +97,12 @@ router.post("/", async (req, res) => {
     if (!req.body.nameOfItem) {
       return res.status(400).json({ error: "nameOfItem is required" });
     }
+    
+    // Generate unique code if not provided
+    if (!req.body.code) {
+      req.body.code = await generateNextCode();
+    }
+    
     const item = await Milestone.create(req.body);
     res.status(201).json(item);
   } catch (e) {
